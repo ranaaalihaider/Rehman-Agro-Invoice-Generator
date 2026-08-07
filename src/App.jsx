@@ -7,14 +7,15 @@ import './index.css';
 function App() {
   const [view, setView] = useState('form');
   const [refNum, setRefNum] = useState('');
-  const [date, setDate] = useState('');
+  const today = new Date().toISOString().split('T')[0];
+  const [date, setDate] = useState(today);
   const [taxPercent, setTaxPercent] = useState(18);
   const [ntnNumber, setNtnNumber] = useState('');
   const [buyerName, setBuyerName] = useState('');
   const [buyerAddress, setBuyerAddress] = useState('');
   const [products, setProducts] = useState([
     { id: 1, name: 'SARSABZ NP, PACKING: 50 KG BAG', uom: 'Bag', qty: 20, price: 10975 },
-    { id: 2, name: 'UREA, PACKING: 50KG/BAG, MAKE: ENGRO/FFC', uom: 'Nos', qty: 20, price: 4800 },
+    { id: 2, name: 'UREA, PACKING: 50KG/BAG, MAKE: ENGRO/FFC', uom: 'Bag', qty: 20, price: 4800 },
     { id: 3, name: 'PAKARAB CAN, PACKING: 50KG/BAG', uom: 'Bag', qty: 20, price: 4375 },
     { id: 4, name: 'ENGRO ZARKHEZ PLUS (8:23:18), PACKING 50KG/BAG', uom: 'Bag', qty: 30, price: 12310 },
     { id: 5, name: 'SOP, PACKING: 25KG/BAG', uom: 'Bag', qty: 20, price: 8670 },
@@ -41,6 +42,13 @@ function App() {
   const grandTotal = subTotal + taxAmount;
 
   const fmt = (n) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Format date as "25-Oct-2023" for the invoice
+  const formatDisplayDate = (d) => {
+    if (!d) return '';
+    const dateObj = new Date(d + 'T00:00:00');
+    return dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
+  };
 
   const handleDownloadPDF = () => {
     const element = invoiceRef.current;
@@ -117,7 +125,7 @@ function App() {
                 </div>
                 <div className="field">
                   <label className="field-label">Date</label>
-                  <input className="field-input" type="text" value={date} onChange={e => setDate(e.target.value)} placeholder="e.g. 25-Oct-2023" />
+                  <input className="field-input" type="date" value={date} onChange={e => setDate(e.target.value)} />
                 </div>
                 <div className="field">
                   <label className="field-label">Tax %</label>
@@ -237,7 +245,7 @@ function App() {
                 <img src={headerImg} alt="Header" style={{ width: '100%', display: 'block' }} />
                 <div className="invoice-meta" style={{ marginTop: '10px' }}>
                   <div>Ref# <span>{refNum}</span></div>
-                  <div style={{ paddingRight: '40px' }}>Date <span>{date}</span></div>
+                  <div style={{ paddingRight: '40px' }}>Date <span>{formatDisplayDate(date)}</span></div>
                 </div>
                 {ntnNumber && (
                   <div className="invoice-meta" style={{ marginTop: '8px' }}>
@@ -318,7 +326,7 @@ function App() {
                 <img src={headerImg} alt="Header" style={{ width: '100%', display: 'block' }} />
                 <div className="invoice-meta" style={{ marginTop: '10px' }}>
                   <div>Ref# <span>{refNum}</span></div>
-                  <div style={{ paddingRight: '40px' }}>Date <span>{date}</span></div>
+                  <div style={{ paddingRight: '40px' }}>Date <span>{formatDisplayDate(date)}</span></div>
                 </div>
                 {ntnNumber && (
                   <div className="invoice-meta" style={{ marginTop: '8px' }}>

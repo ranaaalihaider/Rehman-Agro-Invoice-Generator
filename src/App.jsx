@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 import { Plus, Trash2, Download, Printer, FileText, Edit3, Eye, Package } from 'lucide-react';
 import headerImg from './assets/Header.png';
+import sigRehman from './assets/signatures-rehman.png';
+import sigYasir from './assets/signatures-yasir.png';
 import './index.css';
 
 function App() {
@@ -10,9 +12,13 @@ function App() {
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
   const [taxPercent, setTaxPercent] = useState(18);
-  const [ntnNumber, setNtnNumber] = useState('');
+  const [ntnNumber, setNtnNumber] = useState('7310235');
+  const [strnNumber, setStrnNumber] = useState('');
   const [buyerName, setBuyerName] = useState('');
+  const [signature, setSignature] = useState('');
   const [buyerAddress, setBuyerAddress] = useState('');
+  const [buyerNtn, setBuyerNtn] = useState('');
+  const [buyerStrn, setBuyerStrn] = useState('');
   const [products, setProducts] = useState([
     { id: 1, name: 'SARSABZ NP, PACKING: 50 KG BAG', uom: 'Bag', qty: 20, price: 10975 },
     { id: 2, name: 'UREA, PACKING: 50KG/BAG, MAKE: ENGRO/FFC', uom: 'Bag', qty: 20, price: 4800 },
@@ -135,6 +141,10 @@ function App() {
                   <label className="field-label">Our NTN #</label>
                   <input className="field-input" type="text" value={ntnNumber} onChange={e => setNtnNumber(e.target.value)} placeholder="NTN Number" />
                 </div>
+                <div className="field">
+                  <label className="field-label">Our STRN #</label>
+                  <input className="field-input" type="text" value={strnNumber} onChange={e => setStrnNumber(e.target.value)} placeholder="STRN Number" />
+                </div>
               </div>
             </section>
 
@@ -152,6 +162,14 @@ function App() {
                 <div className="field">
                   <label className="field-label">Buyer Address</label>
                   <input className="field-input" type="text" value={buyerAddress} onChange={e => setBuyerAddress(e.target.value)} placeholder="Enter buyer address" />
+                </div>
+                <div className="field">
+                  <label className="field-label">Buyer NTN #</label>
+                  <input className="field-input" type="text" value={buyerNtn} onChange={e => setBuyerNtn(e.target.value)} placeholder="Enter buyer NTN" />
+                </div>
+                <div className="field">
+                  <label className="field-label">Buyer STRN #</label>
+                  <input className="field-input" type="text" value={buyerStrn} onChange={e => setBuyerStrn(e.target.value)} placeholder="Enter buyer STRN" />
                 </div>
               </div>
             </section>
@@ -210,6 +228,46 @@ function App() {
               </button>
             </section>
 
+            {/* Signatures Card */}
+            <section className="form-card">
+              <div className="form-card-header">
+                <span className="form-card-icon">✍️</span>
+                <h2 className="form-card-title">Signatures</h2>
+              </div>
+              <div style={{ display: 'flex', gap: '20px', alignItems: 'center', padding: '10px 0' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="signature"
+                    value="rehman"
+                    checked={signature === 'rehman'}
+                    onChange={(e) => setSignature(e.target.value)}
+                  />
+                  Signature Rehman
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="signature"
+                    value="yasir"
+                    checked={signature === 'yasir'}
+                    onChange={(e) => setSignature(e.target.value)}
+                  />
+                  Signature Yasir
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="signature"
+                    value=""
+                    checked={signature === ''}
+                    onChange={(e) => setSignature(e.target.value)}
+                  />
+                  None
+                </label>
+              </div>
+            </section>
+
             {/* Summary Card */}
             <section className="summary-card">
               <div className="summary-row">
@@ -241,25 +299,35 @@ function App() {
         <div className="preview-wrapper" style={{ display: view === 'preview' ? 'block' : 'none' }}>
           <div className="invoice-container" ref={invoiceRef}>
               {/* Header Image */}
-              <div style={{ marginBottom: '20px' }}>
+              <div style={{ margin: '-15px -24px 20px -24px' }}>
                 <img src={headerImg} alt="Header" style={{ width: '100%', display: 'block' }} />
-                <div className="invoice-meta" style={{ marginTop: '10px' }}>
-                  <div>Ref# <span>{refNum}</span></div>
-                  <div style={{ paddingRight: '40px' }}>Date <span>{formatDisplayDate(date)}</span></div>
-                </div>
-                {ntnNumber && (
-                  <div className="invoice-meta" style={{ marginTop: '8px' }}>
-                    <div>NTN# <span>{ntnNumber}</span></div>
+                <div style={{ marginTop: '15px', padding: '0 24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="invoice-meta"><div>Ref# <span>{refNum}</span></div></div>
+                      {ntnNumber && <div className="invoice-meta"><div>NTN# <span>{ntnNumber}</span></div></div>}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="invoice-meta"><div style={{ paddingRight: '0' }}>Date <span>{formatDisplayDate(date)}</span></div></div>
+                      {strnNumber && <div className="invoice-meta" style={{ width: 'auto' }}><div>STRN# <span>{strnNumber}</span></div></div>}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Buyer Details */}
-              {(buyerName || buyerAddress) && (
+              {(buyerName || buyerAddress || buyerNtn || buyerStrn) && (
                 <div style={{ marginBottom: '15px', padding: '10px', border: '1px solid #ccc', fontFamily: '"Times New Roman", Times, serif' }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#0d47a1', borderBottom: '1px solid #ccc', display: 'inline-block' }}>Billed To:</div>
-                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{buyerName}</div>
-                  <div style={{ fontSize: '14px' }}>{buyerAddress}</div>
+                  <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#000', borderBottom: '1px solid #ccc', display: 'inline-block' }}>Billed To:</div>
+                  {buyerName && <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{buyerName}</div>}
+                  {buyerAddress && <div style={{ fontSize: '14px' }}>{buyerAddress}</div>}
+                  {(buyerNtn || buyerStrn) && (
+                    <div style={{ fontSize: '14px', display: 'flex', marginTop: '2px' }}>
+                      <div style={{ flex: 1 }}>{buyerNtn && <><span style={{ fontWeight: 'bold' }}>NTN:</span> {buyerNtn}</>}</div>
+                      <div style={{ flex: 1, textAlign: 'center' }}>{buyerStrn && <><span style={{ fontWeight: 'bold' }}>STRN:</span> {buyerStrn}</>}</div>
+                      <div style={{ flex: 1 }}></div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -299,7 +367,20 @@ function App() {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc', verticalAlign: 'bottom', paddingBottom: '4px' }}>
+                      {signature && (
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', fontFamily: '"Times New Roman", Times, serif' }}>
+                          <span style={{ fontWeight: 'bold', fontSize: '14px', whiteSpace: 'nowrap', paddingBottom: '2px' }}>Seller Signatures :</span>
+                          <div style={{ position: 'relative', flex: '0 0 180px', borderBottom: '1.5px solid #000', height: '50px' }}>
+                            <img
+                              src={signature === 'rehman' ? sigRehman : sigYasir}
+                              alt="Signature"
+                              style={{ position: 'absolute', bottom: '2px', left: '8px', maxHeight: '48px', maxWidth: '160px' }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Sub Total</td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(subTotal)}</td>
                   </tr>
@@ -310,8 +391,8 @@ function App() {
                   </tr>
                   <tr>
                     <td colSpan="4" style={{ border: 'none' }}></td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#0d47a1', borderTop: '2px solid #0d47a1', borderBottom: '2px double #0d47a1' }}>GRAND TOTAL</td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#0d47a1', borderTop: '2px solid #0d47a1', borderBottom: '2px double #0d47a1' }}>{fmt(grandTotal)}</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>GRAND TOTAL</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>{fmt(grandTotal)}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -322,23 +403,33 @@ function App() {
         {view === 'form' && (
           <div style={{ position: 'fixed', left: '-9999px', top: 0, width: '780px', zIndex: -1 }}>
             <div className="invoice-container" ref={invoiceRef}>
-              <div style={{ marginBottom: '20px' }}>
+              <div style={{ margin: '-15px -24px 20px -24px' }}>
                 <img src={headerImg} alt="Header" style={{ width: '100%', display: 'block' }} />
-                <div className="invoice-meta" style={{ marginTop: '10px' }}>
-                  <div>Ref# <span>{refNum}</span></div>
-                  <div style={{ paddingRight: '40px' }}>Date <span>{formatDisplayDate(date)}</span></div>
-                </div>
-                {ntnNumber && (
-                  <div className="invoice-meta" style={{ marginTop: '8px' }}>
-                    <div>NTN# <span>{ntnNumber}</span></div>
+                <div style={{ marginTop: '15px', padding: '0 24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="invoice-meta"><div>Ref# <span>{refNum}</span></div></div>
+                      {ntnNumber && <div className="invoice-meta"><div>NTN# <span>{ntnNumber}</span></div></div>}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="invoice-meta"><div style={{ paddingRight: '0' }}>Date <span>{formatDisplayDate(date)}</span></div></div>
+                      {strnNumber && <div className="invoice-meta" style={{ width: 'auto' }}><div>STRN# <span>{strnNumber}</span></div></div>}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
-              {(buyerName || buyerAddress) && (
+              {(buyerName || buyerAddress || buyerNtn || buyerStrn) && (
                 <div style={{ marginBottom: '15px', padding: '10px', border: '1px solid #ccc', fontFamily: '"Times New Roman", Times, serif' }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#0d47a1', borderBottom: '1px solid #ccc', display: 'inline-block' }}>Billed To:</div>
-                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{buyerName}</div>
-                  <div style={{ fontSize: '14px' }}>{buyerAddress}</div>
+                  <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#000', borderBottom: '1px solid #ccc', display: 'inline-block' }}>Billed To:</div>
+                  {buyerName && <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{buyerName}</div>}
+                  {buyerAddress && <div style={{ fontSize: '14px' }}>{buyerAddress}</div>}
+                  {(buyerNtn || buyerStrn) && (
+                    <div style={{ fontSize: '14px', display: 'flex', marginTop: '2px' }}>
+                      <div style={{ flex: 1 }}>{buyerNtn && <><span style={{ fontWeight: 'bold' }}>NTN:</span> {buyerNtn}</>}</div>
+                      <div style={{ flex: 1, textAlign: 'center' }}>{buyerStrn && <><span style={{ fontWeight: 'bold' }}>STRN:</span> {buyerStrn}</>}</div>
+                      <div style={{ flex: 1 }}></div>
+                    </div>
+                  )}
                 </div>
               )}
               <table className="invoice-table">
@@ -367,7 +458,20 @@ function App() {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc', verticalAlign: 'bottom', paddingBottom: '4px' }}>
+                      {signature && (
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', fontFamily: '"Times New Roman", Times, serif' }}>
+                          <span style={{ fontWeight: 'bold', fontSize: '14px', whiteSpace: 'nowrap', paddingBottom: '2px' }}>Seller Signatures :</span>
+                          <div style={{ position: 'relative', flex: '0 0 180px', borderBottom: '1.5px solid #000', height: '50px' }}>
+                            <img
+                              src={signature === 'rehman' ? sigRehman : sigYasir}
+                              alt="Signature"
+                              style={{ position: 'absolute', bottom: '2px', left: '8px', maxHeight: '48px', maxWidth: '160px' }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Sub Total</td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(subTotal)}</td>
                   </tr>
@@ -378,8 +482,8 @@ function App() {
                   </tr>
                   <tr>
                     <td colSpan="4" style={{ border: 'none' }}></td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#0d47a1', borderTop: '2px solid #0d47a1', borderBottom: '2px double #0d47a1' }}>GRAND TOTAL</td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#0d47a1', borderTop: '2px solid #0d47a1', borderBottom: '2px double #0d47a1' }}>{fmt(grandTotal)}</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>GRAND TOTAL</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>{fmt(grandTotal)}</td>
                   </tr>
                 </tfoot>
               </table>

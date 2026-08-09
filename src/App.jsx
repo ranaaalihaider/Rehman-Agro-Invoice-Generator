@@ -4,6 +4,7 @@ import { Plus, Trash2, Download, Printer, FileText, Edit3, Eye, Package } from '
 import headerImg from './assets/Header.png';
 import sigRehman from './assets/signatures-rehman.png';
 import sigYasir from './assets/signatures-yasir.png';
+import logo from './assets/logo.png';
 import './index.css';
 
 function App() {
@@ -83,7 +84,9 @@ function App() {
       {/* ── Header ── */}
       <header className="app-header">
         <div className="app-header-inner">
-          <div className="app-header-icon"><FileText size={32} /></div>
+          <div className="app-header-icon" style={{ background: 'transparent', padding: 0 }}>
+            <img src={logo} alt="Rehman Agro Logo" style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '12px' }} />
+          </div>
           <div>
             <h1 className="app-title">Rehman Agro Invoice Generator</h1>
             <p className="app-subtitle">Create &amp; download professional quotations instantly</p>
@@ -375,7 +378,7 @@ function App() {
                             <img
                               src={signature === 'rehman' ? sigRehman : sigYasir}
                               alt="Signature"
-                              style={{ position: 'absolute', bottom: '2px', left: '8px', maxHeight: '48px', maxWidth: '160px' }}
+                              style={{ position: 'absolute', bottom: '-30px', left: '50%', transform: 'translateX(-50%)', maxHeight: '95px', maxWidth: '220px' }}
                             />
                           </div>
                         </div>
@@ -466,7 +469,7 @@ function App() {
                             <img
                               src={signature === 'rehman' ? sigRehman : sigYasir}
                               alt="Signature"
-                              style={{ position: 'absolute', bottom: '2px', left: '8px', maxHeight: '48px', maxWidth: '160px' }}
+                              style={{ position: 'absolute', bottom: '-30px', left: '50%', transform: 'translateX(-50%)', maxHeight: '95px', maxWidth: '220px' }}
                             />
                           </div>
                         </div>

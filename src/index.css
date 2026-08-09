@@ -149,6 +149,13 @@ body {
 }
 .print-btn:hover { background: var(--amber-dark); transform: translateY(-1px); }
 
+.whatsapp-btn {
+  background: #25D366;
+  border-color: #128C7E;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+.whatsapp-btn:hover { background: #128C7E; transform: translateY(-1px); }
+
 /* ── MAIN ── */
 .main-content {
   max-width: 900px;

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
-import { Plus, Trash2, Download, Printer, FileText, Edit3, Eye, Package } from 'lucide-react';
+import { Plus, Trash2, Download, Printer, FileText, Edit3, Eye, Package, Share2 } from 'lucide-react';
 import headerImg from './assets/Header.png';
 import sigRehman from './assets/signatures-rehman.png';
 import sigYasir from './assets/signatures-yasir.png';
@@ -79,6 +79,33 @@ function App() {
 
   const handlePrint = () => window.print();
 
+  const handleShareWhatsApp = async () => {
+    const element = invoiceRef.current;
+    if (!element) return;
+    const opt = {
+      margin: 0,
+      filename: `Invoice_${refNum || 'Draft'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, width: 780, windowWidth: 780 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    try {
+      const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+      const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Invoice',
+          text: 'Here is the invoice.',
+        });
+      } else {
+        alert("Direct file sharing is not supported on this browser. Please download the PDF and share it manually.");
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   return (
     <div className="app-wrapper">
       {/* ── Header ── */}
@@ -110,6 +137,9 @@ function App() {
           </button>
           <button className="action-btn print-btn" onClick={handlePrint}>
             <Printer size={18} /> <span>Print</span>
+          </button>
+          <button className="action-btn whatsapp-btn" onClick={handleShareWhatsApp}>
+            <Share2 size={18} /> <span>WhatsApp</span>
           </button>
         </div>
       </div>
@@ -291,6 +321,9 @@ function App() {
                 </button>
                 <button className="action-btn print-btn" style={{ flex: 1 }} onClick={handlePrint}>
                   <Printer size={18} /> Print
+                </button>
+                <button className="action-btn whatsapp-btn" style={{ flex: 1 }} onClick={handleShareWhatsApp}>
+                  <Share2 size={18} /> WhatsApp
                 </button>
               </div>
             </section>

@@ -325,10 +325,9 @@ function App() {
                   {buyerName && <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{buyerName}</div>}
                   {buyerAddress && <div style={{ fontSize: '14px' }}>{buyerAddress}</div>}
                   {(buyerNtn || buyerStrn) && (
-                    <div style={{ fontSize: '14px', display: 'flex', marginTop: '2px' }}>
-                      <div style={{ flex: 1 }}>{buyerNtn && <><span style={{ fontWeight: 'bold' }}>NTN:</span> {buyerNtn}</>}</div>
-                      <div style={{ flex: 1, textAlign: 'center' }}>{buyerStrn && <><span style={{ fontWeight: 'bold' }}>STRN:</span> {buyerStrn}</>}</div>
-                      <div style={{ flex: 1 }}></div>
+                    <div style={{ fontSize: '14px', display: 'flex', justifyContent: 'space-between', marginTop: '2px' }}>
+                      <div>{buyerNtn && <><span style={{ fontWeight: 'bold' }}>NTN:</span> {buyerNtn}</>}</div>
+                      <div>{buyerStrn && <><span style={{ fontWeight: 'bold' }}>STRN:</span> {buyerStrn}</>}</div>
                     </div>
                   )}
                 </div>
@@ -427,10 +426,9 @@ function App() {
                   {buyerName && <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{buyerName}</div>}
                   {buyerAddress && <div style={{ fontSize: '14px' }}>{buyerAddress}</div>}
                   {(buyerNtn || buyerStrn) && (
-                    <div style={{ fontSize: '14px', display: 'flex', marginTop: '2px' }}>
-                      <div style={{ flex: 1 }}>{buyerNtn && <><span style={{ fontWeight: 'bold' }}>NTN:</span> {buyerNtn}</>}</div>
-                      <div style={{ flex: 1, textAlign: 'center' }}>{buyerStrn && <><span style={{ fontWeight: 'bold' }}>STRN:</span> {buyerStrn}</>}</div>
-                      <div style={{ flex: 1 }}></div>
+                    <div style={{ fontSize: '14px', display: 'flex', justifyContent: 'space-between', marginTop: '2px' }}>
+                      <div>{buyerNtn && <><span style={{ fontWeight: 'bold' }}>NTN:</span> {buyerNtn}</>}</div>
+                      <div>{buyerStrn && <><span style={{ fontWeight: 'bold' }}>STRN:</span> {buyerStrn}</>}</div>
                     </div>
                   )}
                 </div>

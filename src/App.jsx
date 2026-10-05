@@ -12,7 +12,10 @@ function App() {
   const [refNum, setRefNum] = useState('');
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
-  const [taxPercent, setTaxPercent] = useState(18);
+  const [applySameTax, setApplySameTax] = useState(false);
+  const [sameTaxPercent, setSameTaxPercent] = useState(0);
+  const [otherTaxPercent, setOtherTaxPercent] = useState(0);
+  const [otherCharges, setOtherCharges] = useState(0);
   const [ntnNumber, setNtnNumber] = useState('7310235');
   const [strnNumber, setStrnNumber] = useState('');
   const [buyerName, setBuyerName] = useState('');
@@ -21,23 +24,39 @@ function App() {
   const [buyerNtn, setBuyerNtn] = useState('');
   const [buyerStrn, setBuyerStrn] = useState('');
   const [products, setProducts] = useState([
-    { id: 1, name: 'SARSABZ NP, PACKING: 50 KG BAG', uom: 'Bag', qty: 20, price: 10975 },
-    { id: 2, name: 'UREA, PACKING: 50KG/BAG, MAKE: ENGRO/FFC', uom: 'Bag', qty: 20, price: 4800 },
-    { id: 3, name: 'PAKARAB CAN, PACKING: 50KG/BAG', uom: 'Bag', qty: 20, price: 4375 },
-    { id: 4, name: 'ENGRO ZARKHEZ PLUS (8:23:18), PACKING 50KG/BAG', uom: 'Bag', qty: 30, price: 12310 },
-    { id: 5, name: 'SOP, PACKING: 25KG/BAG', uom: 'Bag', qty: 20, price: 8670 },
-    { id: 6, name: 'ZINC 33%', uom: 'Kgs', qty: 150, price: 570 },
-    { id: 7, name: 'FERTERA FMC MAKE: FMC', uom: 'Kgs', qty: 160, price: 380 },
+    { id: 1, name: 'SARSABZ NP, PACKING: 50 KG BAG', uom: 'Bag', qty: 20, price: 10975, tax: 0 },
+    { id: 2, name: 'UREA, PACKING: 50KG/BAG, MAKE: ENGRO/FFC', uom: 'Bag', qty: 20, price: 4800, tax: 0 },
+    { id: 3, name: 'PAKARAB CAN, PACKING: 50KG/BAG', uom: 'Bag', qty: 20, price: 4375, tax: 0 },
+    { id: 4, name: 'ENGRO ZARKHEZ PLUS (8:23:18), PACKING 50KG/BAG', uom: 'Bag', qty: 30, price: 12310, tax: 0 },
+    { id: 5, name: 'SOP, PACKING: 25KG/BAG', uom: 'Bag', qty: 20, price: 8670, tax: 0 },
+    { id: 6, name: 'ZINC 33%', uom: 'Kgs', qty: 150, price: 570, tax: 0 },
+    { id: 7, name: 'FERTERA FMC MAKE: FMC', uom: 'Kgs', qty: 160, price: 380, tax: 0 },
   ]);
 
   const invoiceRef = useRef(null);
 
   const addProduct = () => {
-    setProducts([...products, { id: Date.now(), name: '', uom: 'Nos', qty: 1, price: 0 }]);
+    setProducts([...products, { id: Date.now(), name: '', uom: 'Nos', qty: 1, price: 0, tax: applySameTax ? sameTaxPercent : 0 }]);
   };
 
   const updateProduct = (id, field, value) => {
     setProducts(products.map(p => p.id === id ? { ...p, [field]: value } : p));
+  };
+
+  const handleApplySameTaxToggle = (e) => {
+    const isChecked = e.target.checked;
+    setApplySameTax(isChecked);
+    if (isChecked) {
+      setProducts(products.map(p => ({ ...p, tax: sameTaxPercent })));
+    }
+  };
+
+  const handleSameTaxChange = (e) => {
+    const val = Number(e.target.value);
+    setSameTaxPercent(val);
+    if (applySameTax) {
+      setProducts(products.map(p => ({ ...p, tax: val })));
+    }
   };
 
   const removeProduct = (id) => {
@@ -45,8 +64,9 @@ function App() {
   };
 
   const subTotal = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
-  const taxAmount = subTotal * (taxPercent / 100);
-  const grandTotal = subTotal + taxAmount;
+  const totalProductTax = products.reduce((sum, p) => sum + (p.qty * p.price * (p.tax / 100)), 0);
+  const otherTaxAmount = subTotal * (otherTaxPercent / 100);
+  const grandTotal = subTotal + totalProductTax + otherTaxAmount + otherCharges;
 
   const fmt = (n) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -167,8 +187,12 @@ function App() {
                   <input className="field-input" type="date" value={date} onChange={e => setDate(e.target.value)} />
                 </div>
                 <div className="field">
-                  <label className="field-label">Tax %</label>
-                  <input className="field-input" type="number" value={taxPercent} onChange={e => setTaxPercent(Number(e.target.value))} />
+                  <label className="field-label">Other Tax %</label>
+                  <input className="field-input" type="number" value={otherTaxPercent} onChange={e => setOtherTaxPercent(Number(e.target.value))} />
+                </div>
+                <div className="field">
+                  <label className="field-label">Other Charges (Rs)</label>
+                  <input className="field-input" type="number" value={otherCharges} onChange={e => setOtherCharges(Number(e.target.value))} />
                 </div>
                 <div className="field">
                   <label className="field-label">Our NTN #</label>
@@ -209,9 +233,27 @@ function App() {
 
             {/* Products Card */}
             <section className="form-card">
-              <div className="form-card-header">
-                <span className="form-card-icon">📦</span>
-                <h2 className="form-card-title">Products <span className="product-count">{products.length} item{products.length !== 1 ? 's' : ''}</span></h2>
+              <div className="form-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="form-card-icon">📦</span>
+                  <h2 className="form-card-title">Products <span className="product-count">{products.length} item{products.length !== 1 ? 's' : ''}</span></h2>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                    <input type="checkbox" checked={applySameTax} onChange={handleApplySameTaxToggle} />
+                    Apply Same Tax
+                  </label>
+                  {applySameTax && (
+                    <input 
+                      type="number" 
+                      className="field-input" 
+                      style={{ width: '80px', padding: '4px 8px' }} 
+                      value={sameTaxPercent} 
+                      onChange={handleSameTaxChange} 
+                      placeholder="Tax %"
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="products-list">
@@ -234,22 +276,30 @@ function App() {
                         style={{ resize: 'vertical', minHeight: '60px' }}
                       />
                     </div>
-                    <div className="product-meta-grid">
+                    <div className="product-meta-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))' }}>
                       <div className="field">
                         <label className="field-label">UOM</label>
                         <input className="field-input" type="text" value={p.uom} onChange={e => updateProduct(p.id, 'uom', e.target.value)} />
                       </div>
                       <div className="field">
-                        <label className="field-label">Quantity</label>
+                        <label className="field-label">Qty</label>
                         <input className="field-input" type="number" value={p.qty} onChange={e => updateProduct(p.id, 'qty', Number(e.target.value))} />
                       </div>
                       <div className="field">
-                        <label className="field-label">Unit Price</label>
+                        <label className="field-label">Price</label>
                         <input className="field-input" type="number" value={p.price} onChange={e => updateProduct(p.id, 'price', Number(e.target.value))} />
                       </div>
                       <div className="field">
-                        <label className="field-label">Line Total</label>
-                        <div className="line-total">PKR {(p.qty * p.price).toLocaleString()}</div>
+                        <label className="field-label">Tax %</label>
+                        <input className="field-input" type="number" value={p.tax} onChange={e => updateProduct(p.id, 'tax', Number(e.target.value))} disabled={applySameTax} />
+                      </div>
+                      <div className="field">
+                        <label className="field-label">Tax Amt</label>
+                        <div className="line-total">{(p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                      </div>
+                      <div className="field">
+                        <label className="field-label">Total</label>
+                        <div className="line-total">{(p.qty * p.price + (p.qty * p.price * (p.tax / 100))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                       </div>
                     </div>
                   </div>
@@ -308,9 +358,21 @@ function App() {
                 <span>PKR {fmt(subTotal)}</span>
               </div>
               <div className="summary-row">
-                <span>Tax ({taxPercent}%)</span>
-                <span>PKR {fmt(taxAmount)}</span>
+                <span>Total Tax Amount</span>
+                <span>PKR {fmt(totalProductTax)}</span>
               </div>
+              {otherTaxPercent > 0 && (
+                <div className="summary-row">
+                  <span>Other Tax ({otherTaxPercent}%)</span>
+                  <span>PKR {fmt(otherTaxAmount)}</span>
+                </div>
+              )}
+              {otherCharges > 0 && (
+                <div className="summary-row">
+                  <span>Other Charges</span>
+                  <span>PKR {fmt(otherCharges)}</span>
+                </div>
+              )}
               <div className="summary-row grand-total-row">
                 <span>Grand Total</span>
                 <span>PKR {fmt(grandTotal)}</span>
@@ -375,6 +437,8 @@ function App() {
                     <th>UOM</th>
                     <th>Qty</th>
                     <th>Price</th>
+                    <th>Tax %</th>
+                    <th>Tax Amt</th>
                     <th>Total</th>
                   </tr>
                 </thead>
@@ -402,7 +466,7 @@ function App() {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc', verticalAlign: 'bottom', paddingBottom: '4px' }}>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc', verticalAlign: 'bottom', paddingBottom: '4px' }}>
                       {signature && (
                         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', fontFamily: '"Times New Roman", Times, serif' }}>
                           <span style={{ fontWeight: 'bold', fontSize: '14px', whiteSpace: 'nowrap', paddingBottom: '2px' }}>Seller Signatures :</span>
@@ -420,12 +484,26 @@ function App() {
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(subTotal)}</td>
                   </tr>
                   <tr>
-                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Tax ({taxPercent}%)</td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(taxAmount)}</td>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Total Tax Amount</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(totalProductTax)}</td>
                   </tr>
+                  {otherTaxPercent > 0 && (
                   <tr>
-                    <td colSpan="4" style={{ border: 'none' }}></td>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Tax ({otherTaxPercent}%)</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(otherTaxAmount)}</td>
+                  </tr>
+                  )}
+                  {otherCharges > 0 && (
+                  <tr>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Charges</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(otherCharges)}</td>
+                  </tr>
+                  )}
+                  <tr>
+                    <td colSpan="6" style={{ border: 'none' }}></td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>GRAND TOTAL</td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>{fmt(grandTotal)}</td>
                   </tr>
@@ -468,9 +546,15 @@ function App() {
               )}
               <table className="invoice-table">
                 <thead><tr>
-                  <th style={{ width: '40px' }}>No.</th>
-                  <th>Product</th><th>UOM</th><th>Qty</th><th>Price</th><th>Total</th>
-                </tr></thead>
+                    <th style={{ width: '40px' }}>No.</th>
+                    <th>Product</th>
+                    <th>UOM</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Tax %</th>
+                    <th>Tax Amt</th>
+                    <th>Total</th>
+                  </tr></thead>
                 <tbody>
                   {products.map((p, idx) => (
                     <tr key={p.id}>
@@ -492,7 +576,7 @@ function App() {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc', verticalAlign: 'bottom', paddingBottom: '4px' }}>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc', verticalAlign: 'bottom', paddingBottom: '4px' }}>
                       {signature && (
                         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', fontFamily: '"Times New Roman", Times, serif' }}>
                           <span style={{ fontWeight: 'bold', fontSize: '14px', whiteSpace: 'nowrap', paddingBottom: '2px' }}>Seller Signatures :</span>
@@ -510,12 +594,26 @@ function App() {
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(subTotal)}</td>
                   </tr>
                   <tr>
-                    <td colSpan="4" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Tax ({taxPercent}%)</td>
-                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(taxAmount)}</td>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Total Tax Amount</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(totalProductTax)}</td>
                   </tr>
+                  {otherTaxPercent > 0 && (
                   <tr>
-                    <td colSpan="4" style={{ border: 'none' }}></td>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Tax ({otherTaxPercent}%)</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(otherTaxAmount)}</td>
+                  </tr>
+                  )}
+                  {otherCharges > 0 && (
+                  <tr>
+                    <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Charges</td>
+                    <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(otherCharges)}</td>
+                  </tr>
+                  )}
+                  <tr>
+                    <td colSpan="6" style={{ border: 'none' }}></td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>GRAND TOTAL</td>
                     <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>{fmt(grandTotal)}</td>
                   </tr>

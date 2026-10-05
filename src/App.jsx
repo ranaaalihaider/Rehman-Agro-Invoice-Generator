@@ -450,13 +450,17 @@ function App() {
                       <td className="bold-val">{p.uom}</td>
                       <td className="bold-val">{p.qty}</td>
                       <td className="bold-val">{p.price.toLocaleString()}</td>
-                      <td className="bold-val">{(p.qty * p.price).toLocaleString()}</td>
+                      <td className="bold-val">{p.tax}%</td>
+                      <td className="bold-val">{(p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="bold-val">{(p.qty * p.price + p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     </tr>
                   ))}
                   {Array.from({ length: Math.max(0, 10 - products.length) }).map((_, i) => (
                     <tr key={`empty-${i}`}>
                       <td style={{ textAlign: 'center' }}>{products.length + i + 1}</td>
                       <td>&nbsp;</td>
+                      <td></td>
+                      <td></td>
                       <td></td>
                       <td></td>
                       <td></td>
@@ -563,13 +567,15 @@ function App() {
                       <td className="bold-val">{p.uom}</td>
                       <td className="bold-val">{p.qty}</td>
                       <td className="bold-val">{p.price.toLocaleString()}</td>
-                      <td className="bold-val">{(p.qty * p.price).toLocaleString()}</td>
+                      <td className="bold-val">{p.tax}%</td>
+                      <td className="bold-val">{(p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="bold-val">{(p.qty * p.price + p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     </tr>
                   ))}
                   {Array.from({ length: Math.max(0, 10 - products.length) }).map((_, i) => (
                     <tr key={`empty-${i}`}>
                       <td style={{ textAlign: 'center' }}>{products.length + i + 1}</td>
-                      <td>&nbsp;</td><td></td><td></td><td></td>
+                      <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td>
                       <td className="bold-val">0</td>
                     </tr>
                   ))}

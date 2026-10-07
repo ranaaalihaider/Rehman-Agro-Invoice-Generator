@@ -290,11 +290,11 @@ function App() {
                         <input className="field-input" type="number" value={p.price} onChange={e => updateProduct(p.id, 'price', Number(e.target.value))} />
                       </div>
                       <div className="field">
-                        <label className="field-label">Tax %</label>
+                        <label className="field-label">GST TAX %</label>
                         <input className="field-input" type="number" value={p.tax} onChange={e => updateProduct(p.id, 'tax', Number(e.target.value))} disabled={applySameTax} />
                       </div>
                       <div className="field">
-                        <label className="field-label">Tax Amt</label>
+                        <label className="field-label">GST TAX Amt</label>
                         <div className="line-total">{(p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                       </div>
                       <div className="field">
@@ -437,8 +437,8 @@ function App() {
                     <th>UOM</th>
                     <th>Qty</th>
                     <th>Price</th>
-                    <th>Tax %</th>
-                    <th>Tax Amt</th>
+                    <th>GST TAX %</th>
+                    <th>GST TAX Amt</th>
                     <th>Total</th>
                   </tr>
                 </thead>
@@ -555,8 +555,8 @@ function App() {
                     <th>UOM</th>
                     <th>Qty</th>
                     <th>Price</th>
-                    <th>Tax %</th>
-                    <th>Tax Amt</th>
+                    <th>GST TAX %</th>
+                    <th>GST TAX Amt</th>
                     <th>Total</th>
                   </tr></thead>
                 <tbody>

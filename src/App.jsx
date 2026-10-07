@@ -37,7 +37,7 @@ function App() {
 
   const addProduct = () => {
     const newId = Date.now();
-    const newP = { id: newId, name: '', uom: 'Bag', qty: 1, price: 0, tax: applySameTax ? Number(sameTaxPercent) || 0 : 0 };
+    const newP = { id: newId, name: '', uom: 'Bag', qty: '', price: '', tax: applySameTax ? Number(sameTaxPercent) || 0 : '' };
     setProducts([...products, newP]);
     setEditingProduct(newId);
   };
@@ -159,12 +159,12 @@ function App() {
             <tr key={p.id}>
               <td style={{ textAlign: 'center' }}>{idx + 1}</td>
               <td className="product-col">{p.name}</td>
-              <td className="bold-val">{p.uom}</td>
-              <td className="bold-val">{p.qty}</td>
-              <td className="bold-val">{p.price.toLocaleString()}</td>
-              <td className="bold-val">{p.tax}%</td>
-              <td className="bold-val">{(p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-              <td className="bold-val">{(p.qty * p.price + p.qty * p.price * (p.tax / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td className="bold-val">{Number(p.uom)||p.uom}</td>
+              <td className="bold-val">{Number(p.qty)||0}</td>
+              <td className="bold-val">{(Number(p.price)||0).toLocaleString()}</td>
+              <td className="bold-val">{Number(p.tax)||0}%</td>
+              <td className="bold-val">{((Number(p.qty)||0) * (Number(p.price)||0) * ((Number(p.tax)||0) / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td className="bold-val">{((Number(p.qty)||0) * (Number(p.price)||0) + (Number(p.qty)||0) * (Number(p.price)||0) * ((Number(p.tax)||0) / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             </tr>
           ))}
           {Array.from({ length: Math.max(0, 10 - products.length) }).map((_, i) => (
@@ -358,13 +358,13 @@ function App() {
                   <div className="product-item__body">
                     <div className="product-item__name">{p.name || <span style={{ color: '#aaa', fontStyle: 'italic' }}>Unnamed product</span>}</div>
                     <div className="product-item__meta">
-                      <span>{p.qty} {p.uom}</span>
+                      <span>{Number(p.qty)||0} {p.uom}</span>
                       <span className="dot">·</span>
-                      <span>PKR {p.price.toLocaleString()}</span>
-                      {p.tax > 0 && <><span className="dot">·</span><span>{p.tax}% GST</span></>}
+                      <span>PKR {(Number(p.price)||0).toLocaleString()}</span>
+                      {(Number(p.tax)||0) > 0 && <><span className="dot">·</span><span>{Number(p.tax)||0}% GST</span></>}
                     </div>
                   </div>
-                  <div className="product-item__total">PKR {(p.qty * p.price + p.qty * p.price * p.tax / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+                  <div className="product-item__total">PKR {((Number(p.qty)||0) * (Number(p.price)||0) + (Number(p.qty)||0) * (Number(p.price)||0) * (Number(p.tax)||0) / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
                   <div className="product-item__actions">
                     <button className="product-item__delete" onClick={(e) => { e.stopPropagation(); removeProduct(p.id); }} title="Delete Product">
                       <Trash2 size={16} />
@@ -426,22 +426,22 @@ function App() {
                 </div>
                 <div className="modal-field">
                   <label>Qty</label>
-                  <input type="number" value={editingP.qty} onChange={e => updateProduct(editingP.id, 'qty', Number(e.target.value))} />
+                  <input type="number" value={editingP.qty} onChange={e => updateProduct(editingP.id, 'qty', e.target.value)} placeholder="1" />
                 </div>
               </div>
               <div className="modal-row">
                 <div className="modal-field">
                   <label>Price (PKR)</label>
-                  <input type="number" value={editingP.price} onChange={e => updateProduct(editingP.id, 'price', Number(e.target.value))} />
+                  <input type="number" value={editingP.price} onChange={e => updateProduct(editingP.id, 'price', e.target.value)} placeholder="0" />
                 </div>
                 <div className="modal-field">
                   <label>GST TAX %</label>
-                  <input type="number" value={editingP.tax} onChange={e => updateProduct(editingP.id, 'tax', Number(e.target.value))} disabled={applySameTax} />
+                  <input type="number" value={editingP.tax} onChange={e => updateProduct(editingP.id, 'tax', e.target.value)} disabled={applySameTax} placeholder="0" />
                 </div>
               </div>
               <div className="modal-totals">
-                <div className="modal-total-row"><span>GST Amount</span><span>PKR {fmt(editingP.qty * editingP.price * editingP.tax / 100)}</span></div>
-                <div className="modal-total-row modal-total-row--main"><span>Line Total</span><span>PKR {fmt(editingP.qty * editingP.price + editingP.qty * editingP.price * editingP.tax / 100)}</span></div>
+                <div className="modal-total-row"><span>GST Amount</span><span>PKR {fmt((Number(editingP.qty)||0) * (Number(editingP.price)||0) * (Number(editingP.tax)||0) / 100)}</span></div>
+                <div className="modal-total-row modal-total-row--main"><span>Line Total</span><span>PKR {fmt((Number(editingP.qty)||0) * (Number(editingP.price)||0) + (Number(editingP.qty)||0) * (Number(editingP.price)||0) * (Number(editingP.tax)||0) / 100)}</span></div>
               </div>
             </div>
             <div className="modal-footer">

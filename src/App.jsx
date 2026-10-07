@@ -265,7 +265,8 @@ function App() {
                         <Trash2 size={16} />
                       </button>
                     </div>
-                    <div className="field" style={{ marginBottom: '12px' }}>
+                    <div className="product-body">
+                      <div className="field">
                       <label className="field-label">Product Name</label>
                       <textarea
                         className="field-input"
@@ -273,10 +274,11 @@ function App() {
                         onChange={e => updateProduct(p.id, 'name', e.target.value)}
                         rows={2}
                         placeholder="Enter product description"
-                        style={{ resize: 'vertical', minHeight: '60px' }}
+                        style={{ resize: 'vertical', minHeight: '48px' }}
                       />
                     </div>
-                    <div className="product-meta-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))' }}>
+                    </div>
+                    <div className="product-meta-grid">
                       <div className="field">
                         <label className="field-label">UOM</label>
                         <input className="field-input" type="text" value={p.uom} onChange={e => updateProduct(p.id, 'uom', e.target.value)} />

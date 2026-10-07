@@ -14,9 +14,9 @@ function App() {
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
   const [applySameTax, setApplySameTax] = useState(false);
-  const [sameTaxPercent, setSameTaxPercent] = useState(0);
-  const [otherTaxPercent, setOtherTaxPercent] = useState(0);
-  const [otherCharges, setOtherCharges] = useState(0);
+  const [sameTaxPercent, setSameTaxPercent] = useState('');
+  const [otherTaxPercent, setOtherTaxPercent] = useState('');
+  const [otherCharges, setOtherCharges] = useState('');
   const [ntnNumber, setNtnNumber] = useState('7310235');
   const [strnNumber, setStrnNumber] = useState('');
   const [buyerName, setBuyerName] = useState('');
@@ -37,7 +37,7 @@ function App() {
 
   const addProduct = () => {
     const newId = Date.now();
-    const newP = { id: newId, name: '', uom: 'Bag', qty: 1, price: 0, tax: applySameTax ? sameTaxPercent : 0 };
+    const newP = { id: newId, name: '', uom: 'Bag', qty: 1, price: 0, tax: applySameTax ? Number(sameTaxPercent) || 0 : 0 };
     setProducts([...products, newP]);
     setEditingProduct(newId);
   };
@@ -54,19 +54,21 @@ function App() {
   const handleApplySameTaxToggle = (e) => {
     const isChecked = e.target.checked;
     setApplySameTax(isChecked);
-    if (isChecked) setProducts(products.map(p => ({ ...p, tax: sameTaxPercent })));
+    if (isChecked) setProducts(products.map(p => ({ ...p, tax: Number(sameTaxPercent) || 0 })));
   };
 
   const handleSameTaxChange = (e) => {
-    const val = Number(e.target.value);
+    const val = e.target.value;
     setSameTaxPercent(val);
-    if (applySameTax) setProducts(products.map(p => ({ ...p, tax: val })));
+    if (applySameTax) setProducts(products.map(p => ({ ...p, tax: Number(val) || 0 })));
   };
 
   const subTotal = products.reduce((sum, p) => sum + (p.qty * p.price), 0);
   const totalProductTax = products.reduce((sum, p) => sum + (p.qty * p.price * (p.tax / 100)), 0);
-  const otherTaxAmount = subTotal * (otherTaxPercent / 100);
-  const grandTotal = subTotal + totalProductTax + otherTaxAmount + Number(otherCharges);
+  const parsedOtherTax = Number(otherTaxPercent) || 0;
+  const parsedOtherCharges = Number(otherCharges) || 0;
+  const otherTaxAmount = subTotal * (parsedOtherTax / 100);
+  const grandTotal = subTotal + totalProductTax + otherTaxAmount + parsedOtherCharges;
 
   const fmt = (n) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -194,18 +196,18 @@ function App() {
             <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Total GST Tax</td>
             <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(totalProductTax)}</td>
           </tr>
-          {otherTaxPercent > 0 && (
+          {parsedOtherTax > 0 && (
             <tr>
               <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
-              <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Tax ({otherTaxPercent}%)</td>
+              <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Tax ({parsedOtherTax}%)</td>
               <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(otherTaxAmount)}</td>
             </tr>
           )}
-          {Number(otherCharges) > 0 && (
+          {parsedOtherCharges > 0 && (
             <tr>
               <td colSpan="6" style={{ border: 'none', borderRight: '1px solid #ccc' }}></td>
               <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>Other Charges</td>
-              <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(Number(otherCharges))}</td>
+              <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px' }}>{fmt(parsedOtherCharges)}</td>
             </tr>
           )}
           <tr>
@@ -264,11 +266,11 @@ function App() {
               </div>
               <div className="field-row field-row--border">
                 <label className="field-row__label">Other Tax %</label>
-                <input className="field-row__input field-row__input--right" type="number" value={otherTaxPercent} onChange={e => setOtherTaxPercent(Number(e.target.value))} />
+                <input className="field-row__input field-row__input--right" type="number" value={otherTaxPercent} onChange={e => setOtherTaxPercent(e.target.value)} placeholder="0" />
               </div>
               <div className="field-row field-row--border">
                 <label className="field-row__label">Other Charges (Rs)</label>
-                <input className="field-row__input field-row__input--right" type="number" value={otherCharges} onChange={e => setOtherCharges(e.target.value)} />
+                <input className="field-row__input field-row__input--right" type="number" value={otherCharges} onChange={e => setOtherCharges(e.target.value)} placeholder="0" />
               </div>
               <div className="field-row field-row--border">
                 <label className="field-row__label">Our NTN #</label>
@@ -318,8 +320,8 @@ function App() {
             <div className="summary-block">
               <div className="summary-line"><span>Sub Total</span><span>PKR {fmt(subTotal)}</span></div>
               <div className="summary-line"><span>Total GST Tax</span><span>PKR {fmt(totalProductTax)}</span></div>
-              {otherTaxPercent > 0 && <div className="summary-line"><span>Other Tax ({otherTaxPercent}%)</span><span>PKR {fmt(otherTaxAmount)}</span></div>}
-              {Number(otherCharges) > 0 && <div className="summary-line"><span>Other Charges</span><span>PKR {fmt(Number(otherCharges))}</span></div>}
+              {parsedOtherTax > 0 && <div className="summary-line"><span>Other Tax ({parsedOtherTax}%)</span><span>PKR {fmt(otherTaxAmount)}</span></div>}
+              {parsedOtherCharges > 0 && <div className="summary-line"><span>Other Charges</span><span>PKR {fmt(parsedOtherCharges)}</span></div>}
               <div className="summary-line summary-line--total"><span>Grand Total</span><span>PKR {fmt(grandTotal)}</span></div>
             </div>
 

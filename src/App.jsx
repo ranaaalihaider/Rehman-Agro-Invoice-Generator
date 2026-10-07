@@ -363,7 +363,12 @@ function App() {
                     </div>
                   </div>
                   <div className="product-item__total">PKR {(p.qty * p.price + p.qty * p.price * p.tax / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
-                  <ChevronRight size={16} className="product-item__chevron" />
+                  <div className="product-item__actions">
+                    <button className="product-item__delete" onClick={(e) => { e.stopPropagation(); removeProduct(p.id); }} title="Delete Product">
+                      <Trash2 size={16} />
+                    </button>
+                    <ChevronRight size={16} className="product-item__chevron" />
+                  </div>
                 </div>
               ))}
             </div>

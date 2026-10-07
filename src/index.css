@@ -502,9 +502,37 @@ body {
   flex-shrink: 0;
 }
 
+.product-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.product-item__delete {
+  background: #FDEDEC;
+  color: var(--danger);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.product-item__delete:hover {
+  background: #F5B7B1;
+}
+
+.product-item__delete:active {
+  transform: scale(0.92);
+}
+
 .product-item__chevron {
   color: var(--border-strong);
-  flex-shrink: 0;
 }
 
 /* ══════════════════════════════════

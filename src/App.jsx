@@ -132,7 +132,7 @@ function App() {
       <header className="app-header">
         <div className="app-header-inner">
           <div className="app-header-icon" style={{ background: 'transparent', padding: 0 }}>
-            <img src={logo} alt="Rehman Agro Logo" style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '12px' }} />
+            <img src={logo} alt="Rehman Agro Logo" style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '8px' }} />
           </div>
           <div>
             <h1 className="app-title">Rehman Agro Invoice Generator</h1>

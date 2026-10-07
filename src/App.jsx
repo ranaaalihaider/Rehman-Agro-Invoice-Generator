@@ -249,8 +249,7 @@ function App() {
       <main className="app-body">
 
         {/* ════ DETAILS TAB ════ */}
-        {tab === 'details' && (
-          <div className="screen">
+        <div className={`screen screen--details ${tab === 'details' ? 'screen--active' : ''}`}>
 
             {/* Invoice Info */}
             <div className="section-label">INVOICE INFO</div>
@@ -324,12 +323,10 @@ function App() {
               <div className="summary-line summary-line--total"><span>Grand Total</span><span>PKR {fmt(grandTotal)}</span></div>
             </div>
 
-          </div>
-        )}
+        </div>
 
         {/* ════ PRODUCTS TAB ════ */}
-        {tab === 'products' && (
-          <div className="screen">
+        <div className={`screen screen--products ${tab === 'products' ? 'screen--active' : ''}`}>
 
             {/* GST toggle */}
             <div className="gst-bar">
@@ -375,17 +372,14 @@ function App() {
             <button className="fab" onClick={addProduct}>
               <Plus size={24} strokeWidth={2.5} />
             </button>
-          </div>
-        )}
+        </div>
 
         {/* ════ PREVIEW TAB ════ */}
-        {tab === 'preview' && (
-          <div className="screen">
+        <div className={`screen screen--preview ${tab === 'preview' ? 'screen--active' : ''}`}>
             <div className="preview-scroller">
               <InvoiceTable />
-            </div>
           </div>
-        )}
+        </div>
 
       </main>
 

@@ -854,18 +854,116 @@ body {
 .invoice-table td.bold-val { font-weight: bold; }
 
 /* ══════════════════════════════════
-   DESKTOP FALLBACK (>540px shown as centered panel)
+   MOBILE ONLY (Hide inactive tabs)
 ══════════════════════════════════ */
-@media (min-width: 541px) {
-  body { background: #1B2631; }
+@media (max-width: 800px) {
+  .screen:not(.screen--active) { display: none; }
+}
+
+/* ══════════════════════════════════
+   DESKTOP VIEW (>800px) - True Dashboard
+══════════════════════════════════ */
+@media (min-width: 801px) {
+  body { background: #E5E8E8; }
   .app-shell {
-    margin: 20px auto;
-    border-radius: 24px;
-    height: calc(100dvh - 40px);
-    overflow: hidden;
+    max-width: 1400px;
+    height: 100dvh;
+    box-shadow: none;
+    margin: 0 auto;
+    background: transparent;
   }
-  .modal { border-radius: 20px 20px 0 0; }
-  .fab { right: calc(50% - 270px + 20px); }
+  
+  .app-bar { border-radius: 0 0 12px 12px; margin-bottom: 20px; }
+  .total-strip { display: none; } /* Show totals somewhere else if needed, or rely on preview */
+  .bottom-nav { display: none; }
+  
+  /* The body becomes a split grid */
+  .app-body {
+    display: grid;
+    grid-template-columns: 1fr 450px;
+    gap: 24px;
+    padding: 0 24px 24px;
+    overflow: hidden; /* stop overall scrolling, individual columns scroll */
+  }
+
+  /* Left column for forms */
+  .screen--details {
+    grid-column: 1;
+    grid-row: 1;
+    overflow-y: auto;
+    padding: 0;
+    padding-right: 12px;
+  }
+
+  /* We put products right under details in the same column using a wrapper if we could, 
+     but since they are siblings, we can stack them using grid */
+  .screen--details, .screen--products {
+    display: block !important; /* ensure visible */
+  }
+  
+  .app-body {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  /* If we have 3 siblings (details, products, preview), let's map them cleanly */
+  .screen--details {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    overflow-y: auto;
+    padding: 0 16px 20px 0;
+  }
+  
+  .screen--products {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    overflow-y: auto;
+    padding: 0 16px 20px 0;
+  }
+  
+  .screen--preview {
+    display: none; /* Hide preview tab on desktop if we want just form, OR */
+  }
+  
+  /* Better: 3-column layout for super wide screens */
+  @media (min-width: 1200px) {
+    .app-body {
+      grid-template-columns: 350px 400px 1fr;
+    }
+    .screen--details { grid-column: 1; border-right: 1px solid var(--border); }
+    .screen--products { grid-column: 2; border-right: 1px solid var(--border); padding-left: 16px; }
+    .screen--preview { grid-column: 3; display: block; overflow-y: auto; padding-left: 16px; }
+    
+    .invoice-container {
+      transform: scale(0.65);
+      margin-bottom: -40%;
+      box-shadow: var(--shadow);
+    }
+  }
+
+  /* 2-column fallback for 801px - 1199px */
+  @media (max-width: 1199px) {
+    .app-body { grid-template-columns: 1fr 1fr; }
+    .screen--details { grid-column: 1; border-right: 1px solid var(--border); }
+    .screen--products { grid-column: 2; padding-left: 16px;}
+    /* Don't show preview tab automatically, rely on print/download */
+    .screen--preview { display: none; }
+  }
+
+  /* Desktop FAB adjustments */
+  .fab {
+    bottom: 30px;
+    right: 30px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .modal {
+    border-radius: 16px;
+    max-width: 600px;
+    margin: auto;
+    max-height: 80vh;
+  }
 }
 
 /* ══════════════════════════════════

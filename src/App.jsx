@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
-import { Plus, Trash2, Download, Printer, FileText, Edit3, Eye, Share2, ChevronRight, X, Check, LayoutList } from 'lucide-react';
+import { Plus, Trash2, Download, Printer, FileText, Eye, Share2, ChevronRight, X, Check, LayoutList } from 'lucide-react';
 import headerImg from './assets/Header.png';
 import sigRehman from './assets/signatures-rehman.png';
 import sigYasir from './assets/signatures-yasir.png';
@@ -21,6 +21,7 @@ function App() {
   const [strnNumber, setStrnNumber] = useState('');
   const [buyerName, setBuyerName] = useState('');
   const [signature, setSignature] = useState('');
+  const [note, setNote] = useState('');
   const [buyerAddress, setBuyerAddress] = useState('');
   const [buyerNtn, setBuyerNtn] = useState('');
   const [buyerStrn, setBuyerStrn] = useState('');
@@ -211,7 +212,14 @@ function App() {
             </tr>
           )}
           <tr>
-            <td colSpan="6" style={{ border: 'none' }}></td>
+            <td colSpan="6" style={{ border: 'none', textAlign: 'left', verticalAlign: 'middle', padding: '6px 12px' }}>
+              {note && (
+                <div style={{ fontSize: '13px', fontFamily: '"Times New Roman", Times, serif', color: '#000', lineHeight: '1.3' }}>
+                  <span style={{ fontWeight: 'bold' }}>Note: </span>
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{note.replace(/^note:\s*/i, '')}</span>
+                </div>
+              )}
+            </td>
             <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>GRAND TOTAL</td>
             <td style={{ fontWeight: 'bold', textAlign: 'right', paddingRight: '15px', fontSize: '16px', color: '#000', borderTop: '2px solid #000', borderBottom: '2px double #000' }}>{fmt(grandTotal)}</td>
           </tr>
@@ -303,8 +311,8 @@ function App() {
               </div>
             </div>
 
-            {/* Signature */}
-            <div className="section-label">SIGNATURE</div>
+            {/* Signature & Note */}
+            <div className="section-label">SIGNATURE & NOTE</div>
             <div className="card">
               {[{ value: 'rehman', label: 'Rehman' }, { value: 'yasir', label: 'Yasir' }, { value: '', label: 'None' }].map(s => (
                 <label key={s.value} className={`sig-row ${signature === s.value ? 'sig-row--active' : ''}`}>
@@ -313,6 +321,17 @@ function App() {
                   <input type="radio" name="sig" value={s.value} checked={signature === s.value} onChange={e => setSignature(e.target.value)} style={{ display: 'none' }} />
                 </label>
               ))}
+              <div className="field-row field-row--border" style={{ alignItems: 'flex-start', padding: '10px 14px' }}>
+                <label className="field-row__label" style={{ paddingTop: '4px' }}>Note</label>
+                <textarea
+                  className="field-row__input"
+                  rows={2}
+                  value={note}
+                  onChange={e => setNote(e.target.value)}
+                  placeholder="e.g. Terms & conditions, payment terms..."
+                  style={{ textAlign: 'left', resize: 'vertical', minHeight: '44px', lineHeight: '1.4' }}
+                />
+              </div>
             </div>
 
             {/* Summary */}
